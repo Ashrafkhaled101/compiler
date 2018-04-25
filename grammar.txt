@@ -1,0 +1,15 @@
+<prog>::=  PROGRAM  <prog-name>  VAR <id-list> BEGIN <stmt-list> END.
+<prog-name>	::=  id
+<id-list> ::=  id | <id-list>, id
+<stmt-list> ::=  <stmt> | <stmt-list> ; <stmt>
+<stmt> ::=  <assign> | <read>  | <write> | <for>
+<assign> ::=  id := <exp>
+<exp> ::= <factor> + <factor> | <factor> * factor>
+<factor> ::= id | ( <exp> )
+<read> ::= READ ( <id-list> )
+<write> ::= WRITE ( <id-list> )
+<for> ::= FOR <index-exp> DO <body>
+<index-exp> ::= id  := <exp> to <exp>
+<body> ::= <stmt> | BEGIN <stmt-list> END
+<digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<latter> ::= a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z
