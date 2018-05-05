@@ -3,7 +3,7 @@ VAR
 	X,Y,A,B,C,Z,SUMQ
 BEGIN
 	READ(X,Y,Z,B);
-	A := + B;
+	A := A + B;
 	C := X +  Z;
 	C := C* 96646;
 	Z := A + B + C + Y;
