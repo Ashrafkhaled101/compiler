@@ -278,7 +278,6 @@ int ID_LIST(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nID_LIST failure");
         strcpy(msg,"Format Error - The Program ID List either missing or unrecognized.");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -320,7 +319,6 @@ int READ(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nREAD failure");
         strcpy(msg,"Format Error - Unrecognized READ() ,[-READ(In1,In2,...)]");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -361,7 +359,6 @@ int WRITE(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nWRITE failure");
         strcpy(msg,"Format Error - Unrecognized READ() ,[-WRITE(In1,In2,...)]");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -400,7 +397,6 @@ int ASSIGN(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nASSIGN failure");
         strcpy(msg,"Format Error - Unrecognized assign operation , [-<assign> ::=  id := <exp>]");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -438,7 +434,6 @@ int EXP(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nEXP failure");
         strcpy(msg,"Format Error - Unrecognized Expression , [-<exp> ::= <factor> + <factor> | <factor> * factor>]");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -475,7 +470,6 @@ int TERM(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nTerm failure");
         strcpy(msg,"Format Error - Unrecognized Term , [-<exp> ::= <factor> * <factor> | <factor> / factor>]");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -522,7 +516,6 @@ int FACTOR(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nTerm failure");
         strcpy(msg,"Format Error - Unrecognized Factor , [-<factor> ::= id | ( <exp> )]");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -582,7 +575,6 @@ int PROG(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nPROG failure");
         strcpy(msg,"Fatal Error - While Parsing the program.");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -609,7 +601,6 @@ int PROG_NAME(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nPROG_NAME failure");
         strcpy(msg,"Error - The Program name either missing or unrecognized , [-<prog-name>	::=  id].");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -641,7 +632,6 @@ int STMT_LIST(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nSTMT_LIST failure");
         strcpy(msg,"Format Error - The Program's Statement List is either missing or unrecognized,[-<stmt-list> ::=  <stmt> | <stmt-list> ; <stmt>].");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
@@ -665,7 +655,6 @@ int STMT(){
         ErrorLog(result,msg,place);
         return 1;
     }else{
-        printf("\nSTMT failure");
         strcpy(msg,"Format Error - The Program's Statement is either missing or unrecognized,[-<stmt> ::=  <assign> | <read>  | <write> | <for>].");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
