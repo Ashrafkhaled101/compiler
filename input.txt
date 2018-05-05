@@ -2,11 +2,11 @@ PROGRAM BASICS
 VAR
 	X,Y,A,B,C,Z,SUMQ
 BEGIN
-	READ(X,Y,Z,B)
-	A := X+ B;
+	READ(X,Y,Z,B);
+	A := + B;
 	C := X +  Z;
 	C := C* 96646;
 	Z := A + B + C + Y;
-	SUMQ := Z + B
+	SUMQ := Z + B;
 	WRITE(A, C,Z)
 END.
