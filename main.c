@@ -117,7 +117,7 @@ int main()
     //s = newStack(); // stack
 
     FILE *inputf,*schemaf,*tokensf;
-    inputf      = fopen("sum.txt","r");
+    inputf      = fopen("hourstomins.txt","r");
     schemaf     = fopen("schema.txt","r");
     tokensf     = fopen("tokens.txt","w");
     remove("log.txt"); // remove the previous log file
@@ -752,6 +752,7 @@ int ASSIGN(){
 
         // code generation
         strcpy(rn,"null"); // reset rn
+
         while(STACKCOUNTER > 0){
 
             if(strcmp(rn,"null") == 0){
@@ -759,18 +760,20 @@ int ASSIGN(){
                     strcpy(rn,s->data); // set rn
                     printf("\tLDA\t%s\n",s->data); // LDA
                 }
-                STACKCOUNTER --;
             }else if((strcmp(rn,"null")!=0)&&(strcmp(s->type,"16")==0)){
-                STACKCOUNTER--;
-                s=s->next;
-                printf("\tADD\t%s\n",s->data);
+                printf("\tADD\t");
 
             }else if((strcmp(rn,"null")!=0)&& strcmp(s->type,"18")==0){
-                STACKCOUNTER--;
-                s=s->next;
-                printf("\tMULL\t%s\n",s->data);
+                printf("\tMULL\t");
 
+            }else if(strcmp(rn,"null") != 0){
+                if(strcmp(s->type,"22")==0 || strcmp(s->type,"23")==0 ){
+                    printf("%s\n",s->data); // LDA
+                }
             }
+
+            STACKCOUNTER--;
+            s=s->next;
 
         }
         STACKCOUNTER = 0;
@@ -844,14 +847,14 @@ int FACTOR(){
     }else{
 
         if(strcmp(list->type,"20")==0){
-            push(&s,list->data,list->type,list->line);
-            STACKCOUNTER++;
+            //push(&s,list->data,list->type,list->line);
+            //STACKCOUNTER++;
             list= list->next;
             //token();
             if(EXP() == 1){
                 if(strcmp(list->type,"21")==0){
-                    push(&s,list->data,list->type,list->line);
-                    STACKCOUNTER++;
+                    //push(&s,list->data,list->type,list->line);
+                    //STACKCOUNTER++;
                     FOUND = 1;
                     list = list->next;
                     token();
