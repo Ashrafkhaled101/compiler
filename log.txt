@@ -1,0 +1,12 @@
+[#Line]	[Parse-Stage]		Result		Informations
+
+[1]	[PROG_NAME()]		SUCCESS		The program has passed this parsing stage successfully!
+[5]	[DEC_LIST()]		SUCCESS		The program has passed this parsing stage successfully!
+[7]	[ASSIGN()]		FAILURE		Format Error - Unrecognized assign operation , [-<assign> ::=  id := <exp>]
+[7]	[ID_LIST()]		SUCCESS		The program has passed this parsing stage successfully!
+[7]	[READ()]		SUCCESS		The program has passed this parsing stage successfully!
+[7]	[STMT()]		SUCCESS		The program has passed this parsing stage successfully!
+[9]	[FACTOR()]		SUCCESS		The program has passed this parsing stage successfully!
+[9]	[FACTOR()]		SUCCESS		The program has passed this parsing stage successfully!
+[9]	[EXP() ]		SUCCESS		The program has passed this parsing stage successfully!
+[9]	[ASSIGN()]		SUCCESS		The program has passed this parsing stage successfully!

@@ -1,13 +1,14 @@
 <prog>::=  PROGRAM  <prog-name>  VAR <id-list> BEGIN <stmt-list> END.
-/<prog-name>	::=  id
-/<id-list> ::=  id | <id-list>, id
+<prog-name>	::=  id
+<id-list> ::=  id | <id-list>, id
 <stmt-list> ::=  <stmt> | <stmt-list> ; <stmt>
 <stmt> ::=  <assign> | <read>  | <write> | <for>
-/<assign> ::=  id := <exp>
-/<exp> ::= <factor> + <factor> | <factor> * factor>
-/<factor> ::= id | ( <exp> )
-/<read> ::= READ ( <id-list> )
-/<write> ::= WRITE ( <id-list> )
+<assign> ::=  id := <exp>
+<exp> ::= <factor> + <factor> | <factor> - factor>
+<term> ::= <factor> * <factor> | <factor> / factor>
+<factor> ::= id | ( <exp> )
+<read> ::= READ ( <id-list> )
+<write> ::= WRITE ( <id-list> )
 <for> ::= FOR <index-exp> DO <body>
 <index-exp> ::= id  := <exp> to <exp>
 <body> ::= <stmt> | BEGIN <stmt-list> END

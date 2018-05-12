@@ -6,7 +6,7 @@ BEGIN
 	A := A + B;
 	C := X +  Z;
 	C := C* 96646;
-	Z := A + B + C + Y;
+	Z := A + B + C * Y;
 	SUMQ := Z + B;
 	WRITE(A, C,Z)
 END.

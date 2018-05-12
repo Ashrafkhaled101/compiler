@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "list.h"
+
 
 // A linked list node
 struct Node
@@ -9,16 +11,50 @@ struct Node
     char data[10];
     char type[10];
     int line;
+    int size;
     struct Node *next;
     struct Node *prev;
+
 };
 
 struct Node* list = NULL; //list Iterator.
+int listSize = 0;
+struct Node* s = NULL; // stack with linked-list
+//FIFO List (QUEUE!)
+#define QueueElement char*
+
+typedef struct{
+    int capacity;
+    int size;
+    QueueElement e;
+    struct list_head list;
+} Queue;
+
+// FILO linked-list (Stack)
+/**
+ * Type for individual stack entry
+ */
+struct stack_entry {
+  char *data;
+  struct stack_entry *next;
+};
+
+/**
+ * Type for stack instance
+ */
+struct stack_t
+{
+  struct stack_entry *head;
+  size_t stackSize;  // not strictly necessary, but
+                     // useful for logging
+};
 
 
+//SOME SICK FUNCTIONS ..
 int IsValidNumber(char * string);
 int IsValidNumberOrLetter(char c);
 void append(struct Node** head_ref, char* new_data , char* new_data2 , int line);
+void push(struct Node** head_ref, char* new_data , char* new_data2 ,int line);
 
 // Parser.
 int PROG();
@@ -30,8 +66,9 @@ int WRITE();
 int ID_LIST();
 int ASSIGN();
 int EXP();
-int TERM();
+//int TERM();
 int FACTOR();
+int DEC_LIST();
 
 // Parsing Errors Logs.
 char result[10],msg[1000],place[12];
@@ -40,14 +77,50 @@ void ErrorLog(char*result , char*msg, char*place);
 // Debug
 void token();
 
+//Queue
+Queue * initQueue(int max);
+QueueElement front(Queue *Q);
+QueueElement tail(Queue* Q);
+void dequeue(Queue *Q);
+void enqueue(Queue *Q, QueueElement element);
+
+
+//SATCK
+struct stack_t *newStack(void);
+char *copyString(char *str);
+void pushs(struct stack_t *theStack, char *value);
+char *top(struct stack_t *theStack);
+void pop(struct stack_t *theStack);
+void clear (struct stack_t *theStack);
+void destroyStack(struct stack_t **theStack);
+
+// FIFO
+Queue* q;
+// FILO
+//struct stack_t *s;
+
+
+// Queue counter
+int LISTCOUNT = 0;
+//STACK counter
+int STACKCOUNTER = 0;
+// program counter
+int LOCCTR = 0;
+// contains the variable which is in the A ATM .
+char rn[20];
+
+
+
 int main()
 {
+    q = initQueue(265); // queue
+    //s = newStack(); // stack
 
     FILE *inputf,*schemaf,*tokensf;
-    inputf      = fopen("input.txt","r");
+    inputf      = fopen("sum.txt","r");
     schemaf     = fopen("schema.txt","r");
     tokensf     = fopen("tokens.txt","w");
-
+    remove("log.txt"); // remove the previous log file
     FILE *logf = fopen("log.txt","a");
     fprintf(logf,"[#Line]\t[Parse-Stage]\t\tResult\t\tInformations\n\n");
     fclose(logf);
@@ -58,10 +131,10 @@ int main()
     fscanf(inputf,"%s %s\n",label,name);
     if(strcmp(label,"PROGRAM") == 0){
         fprintf(tokensf,"Line\tToken type\tToken specifier\n");
-        printf("Line\tToken type\tToken specifier\n");
+        //printf("Line\tToken type\tToken specifier\n");
 
         fprintf(tokensf,"%d\t1\t\t%s\n1\t22\t\t%s\n",lines,label,name);
-        printf("%d\t1\t\t%s\n1\t22\t\t%s\n",lines,label,name);
+        //printf("%d\t1\t\t%s\n1\t22\t\t%s\n",lines,label,name);
 
         append(&list,label,"1",lines);
         append(&list,name,"22",lines);
@@ -88,7 +161,7 @@ int main()
                 while(strcmp(keyword,"EXIT") != 0){
                     if(strcmp(token,keyword) == 0){
                         fprintf(tokensf,"%d\t%s\t\t%s\n",lines,tokentype,keyword);
-                        printf("%d\t%s\t\t%s\n",lines,tokentype,keyword);
+                        //printf("%d\t%s\t\t%s\n",lines,tokentype,keyword);
                         append(&list,keyword,tokentype,lines);
 
                         Iskeyword = 1;
@@ -101,14 +174,14 @@ int main()
                     if(IsValidNumber(token) == 1){
                         // int
                         fprintf(tokensf,"%d\t23\t\t#%s\n",lines,token);
-                        printf("%d\t23\t\t#%s\n",lines,token);
+                        //printf("%d\t23\t\t#%s\n",lines,token);
                         append(&list,token,"23",lines);
 
 
                     }else{
                         // id
                         fprintf(tokensf,"%d\t22\t\t%s\n",lines,token);
-                        printf("%d\t22\t\t%s\n",lines,token);
+                        //printf("%d\t22\t\t%s\n",lines,token);
                         append(&list,token,"22",lines);
                     }
 
@@ -142,7 +215,7 @@ int main()
                 while(strcmp(keyword,"EXIT") != 0){
                     if(strcmp(token,keyword) == 0){
                         fprintf(tokensf,"%d\t%s\t\t%s\n",lines,tokentype,keyword);
-                        printf("%d\t%s\t\t%s\n",lines,tokentype,keyword);
+                        //printf("%d\t%s\t\t%s\n",lines,tokentype,keyword);
                         append(&list,token,tokentype,lines);
 
                         break;
@@ -168,7 +241,7 @@ int main()
     //printf("END.");
     //printf("\nNumber of lines : %d\n",lines);
     fprintf(tokensf,"%d\t5\t\tEND.\n",lines);
-    printf("%d\t5\t\tEND.\n",lines);
+    //printf("%d\t5\t\tEND.\n",lines);
     append(&list,"END.","5",lines);
 
     // Parser
@@ -178,6 +251,7 @@ int main()
     }else{
         printf("\nFailed While Parsing ... ");
     }
+
     return 0;
 }
 
@@ -216,6 +290,7 @@ void append(struct Node** head_ref, char* new_data , char* new_data2 ,int line){
     strcpy(new_node->data,new_data);
     strcpy(new_node->type,new_data2);
     new_node->line = line;
+    listSize++;
     /* 3. This new node is going to be the last node, so
           make next of it as NULL*/
     new_node->next = NULL;
@@ -242,6 +317,30 @@ void append(struct Node** head_ref, char* new_data , char* new_data2 ,int line){
     return;
 }
 
+/* Given a reference (pointer to pointer) to the head of a list
+   and an int, inserts a new node on the front of the list. */
+void push(struct Node** head_ref, char* new_data , char* new_data2 ,int line)
+{
+    /* 1. allocate node */
+    struct Node* new_node = (struct Node*) malloc(sizeof(struct Node));
+
+    /* 2. put in the data  */
+    strcpy(new_node->data,new_data);
+    strcpy(new_node->type,new_data2);
+    new_node->line = line;
+
+    /* 3. Make next of new node as head and previous as NULL */
+    new_node->next = (*head_ref);
+    new_node->prev = NULL;
+
+    /* 4. change prev of head node to new node */
+    if((*head_ref) !=  NULL)
+      (*head_ref)->prev = new_node ;
+
+    /* 5. move the head to point to the new node */
+    (*head_ref)    = new_node;
+}
+
 
  // ---------------------------------- Parser - Implementation -------------------------------------
 
@@ -254,15 +353,18 @@ int ID_LIST(){
     int FOUND = 0;
     if(strcmp(list->type,"22")==0){
         FOUND = 1;
+        enqueue(q,list->data);
+        LISTCOUNT ++;
         list = list->next;
-        token();
-
+        //token();
         while((strcmp(list->type,"14")==0) && FOUND == 1){
             list = list->next;
-            token();
+            //token();
             if(strcmp(list->type,"22")==0){
+                enqueue(q,list->data);
+                LISTCOUNT ++;
                 list=list->next;
-                token();
+                //token();
             }else{
                 FOUND = 0;
                 break;
@@ -276,9 +378,66 @@ int ID_LIST(){
         strcpy(msg,"The program has passed this parsing stage successfully!");
         strcpy(result,"SUCCESS");
         ErrorLog(result,msg,place);
+
+        //code generation
+
         return 1;
     }else{
         strcpy(msg,"Format Error - The Program ID List either missing or unrecognized.");
+        strcpy(result,"FAILURE");
+        ErrorLog(result,msg,place);
+        return 0;
+    }
+
+}
+
+
+ // EXAMPLE :- READ(SUM,X,B,C)
+ // NOTE :-
+ //         22  id
+ //         14  ,
+int DEC_LIST(){
+
+    int FOUND = 0;
+    if(strcmp(list->type,"22")==0){
+        FOUND = 1;
+        enqueue(q,list->data);
+        LISTCOUNT ++;
+        list = list->next;
+        //token();
+        while((strcmp(list->type,"14")==0) && FOUND == 1){
+            list = list->next;
+            //token();
+            if(strcmp(list->type,"22")==0){
+                enqueue(q,list->data);
+                LISTCOUNT ++;
+                list=list->next;
+                //token();
+            }else{
+                FOUND = 0;
+                break;
+            }
+        }
+    }
+
+    strcpy(place,"DEC_LIST()");
+
+    if(FOUND == 1){
+        strcpy(msg,"The program has passed this parsing stage successfully!");
+        strcpy(result,"SUCCESS");
+        ErrorLog(result,msg,place);
+
+        //code generation
+        while(LISTCOUNT > 0){
+            printf("%s\tRESW\t1\n",front(q));
+            dequeue(q);
+            LISTCOUNT --;
+            LOCCTR+=3;
+        }
+        LISTCOUNT = 0;
+        return 1;
+    }else{
+        strcpy(msg,"Format Error - The Program DEC List either missing or unrecognized.");
         strcpy(result,"FAILURE");
         ErrorLog(result,msg,place);
         return 0;
@@ -297,7 +456,7 @@ int READ(){
 
     if(strcmp(list->type,"8")==0){
         list = list->next;
-        token();
+        //token();
         if(strcmp(list->type,"20")==0){
             list = list->next;
             token();
@@ -317,6 +476,18 @@ int READ(){
         strcpy(msg,"The program has passed this parsing stage successfully!");
         strcpy(result,"SUCCESS");
         ErrorLog(result,msg,place);
+
+        // code generation of read
+        printf("\t+JUSB\tXREAD\n");
+        printf("\tWORD\t%d\n",LISTCOUNT);
+        while(LISTCOUNT > 0){
+            printf("\tWORD\t%s\n",front(q));
+            dequeue(q);
+            LISTCOUNT --;
+        }
+        LISTCOUNT = 0;
+
+
         return 1;
     }else{
         strcpy(msg,"Format Error - Unrecognized READ() ,[-READ(In1,In2,...)]");
@@ -357,6 +528,16 @@ int WRITE(){
         strcpy(msg,"The program has passed this parsing stage successfully!");
         strcpy(result,"SUCCESS");
         ErrorLog(result,msg,place);
+        // code generation of read
+        printf("\t+JUSB\tXWRITE\n");
+        printf("\tWORD\t%d\n",LISTCOUNT);
+        while(LISTCOUNT > 0){
+            printf("\tWORD\t%s\n",front(q));
+            dequeue(q);
+            LISTCOUNT --;
+        }
+        LISTCOUNT = 0;
+
         return 1;
     }else{
         strcpy(msg,"Format Error - Unrecognized READ() ,[-WRITE(In1,In2,...)]");
@@ -371,11 +552,13 @@ int WRITE(){
  //         22  id
  //         15  =
 
+/*
 int ASSIGN(){
 
     int FOUND = 0;
-
+    char id[20];
     if(strcmp(list->type,"22")==0){
+        strcpy(id,list->data);
         list = list->next;
         token();
         if(strcmp(list->type,"15")==0){
@@ -395,6 +578,10 @@ int ASSIGN(){
         strcpy(msg,"The program has passed this parsing stage successfully!");
         strcpy(result,"SUCCESS");
         ErrorLog(result,msg,place);
+
+
+        // code generation
+        printf("\tSTA\t%s\n",id );
         return 1;
     }else{
         strcpy(msg,"Format Error - Unrecognized assign operation , [-<assign> ::=  id := <exp>]");
@@ -527,6 +714,172 @@ int FACTOR(){
 
 
 }
+*/
+
+
+ // NOTE :-
+ //         22  id
+ //         15  =
+
+
+int ASSIGN(){
+
+    int FOUND = 0;
+    char id[20]; // save variable result into it
+
+    if(strcmp(list->type,"22")==0){
+        strcpy(id,list->data);
+        list = list->next;
+        token();
+        if(strcmp(list->type,"15")==0){
+            list = list->next;
+            token();
+
+            if(EXP() == 1){
+                FOUND = 1;
+            }
+        }
+
+    }
+
+    strcpy(place,"ASSIGN()");
+
+    if(FOUND == 1){
+        strcpy(msg,"The program has passed this parsing stage successfully!");
+        strcpy(result,"SUCCESS");
+        ErrorLog(result,msg,place);
+
+
+        // code generation
+        strcpy(rn,"null"); // reset rn
+        while(STACKCOUNTER > 0){
+
+            if(strcmp(rn,"null") == 0){
+                if(strcmp(s->type,"22")==0 || strcmp(s->type,"23")==0 ){
+                    strcpy(rn,s->data); // set rn
+                    printf("\tLDA\t%s\n",s->data); // LDA
+                }
+                STACKCOUNTER --;
+            }else if((strcmp(rn,"null")!=0)&&(strcmp(s->type,"16")==0)){
+                STACKCOUNTER--;
+                s=s->next;
+                printf("\tADD\t%s\n",s->data);
+
+            }else if((strcmp(rn,"null")!=0)&& strcmp(s->type,"18")==0){
+                STACKCOUNTER--;
+                s=s->next;
+                printf("\tMULL\t%s\n",s->data);
+
+            }
+
+        }
+        STACKCOUNTER = 0;
+        printf("\tSTA\t%s\n",id );
+        return 1;
+    }else{
+        strcpy(msg,"Format Error - Unrecognized assign operation , [-<assign> ::=  id := <exp>]");
+        strcpy(result,"FAILURE");
+        ErrorLog(result,msg,place);
+        return 0;
+    }
+
+
+
+}
+
+
+ // NOTE :-
+ //         16  +
+ //         18  *
+
+int EXP(){
+
+    int FOUND = 0;
+
+    if(FACTOR() == 1){
+        FOUND = 1;
+        while(((strcmp(list->type,"16")==0) || (strcmp(list->type,"18")==0))&& FOUND == 1){
+            push(&s,list->data,list->type,list->line);
+            STACKCOUNTER++;
+            list = list->next;
+            //token();
+            if(FACTOR() == 0){
+                FOUND = 0;
+            }
+        }
+    }
+
+    strcpy(place,"EXP() ");
+
+    if(FOUND == 1){
+        strcpy(msg,"The program has passed this parsing stage successfully!");
+        strcpy(result,"SUCCESS");
+        ErrorLog(result,msg,place);
+        return 1;
+    }else{
+        strcpy(msg,"Format Error - Unrecognized Expression , [-<exp> ::= <factor> + <factor> | <factor> * factor>]");
+        strcpy(result,"FAILURE");
+        ErrorLog(result,msg,place);
+        return 0;
+    }
+
+
+}
+// NOTE :-
+// 22   id
+// 23   int
+// 20   (
+// 21   )
+
+int FACTOR(){
+
+    int FOUND = 0 ;
+    if ((strcmp(list->type,"22")==0) || (strcmp(list->type,"23")==0)){
+        FOUND = 1;
+        push(&s,list->data,list->type,list->line);
+        STACKCOUNTER++;
+        list = list->next;
+        token();
+
+    }else{
+
+        if(strcmp(list->type,"20")==0){
+            push(&s,list->data,list->type,list->line);
+            STACKCOUNTER++;
+            list= list->next;
+            //token();
+            if(EXP() == 1){
+                if(strcmp(list->type,"21")==0){
+                    push(&s,list->data,list->type,list->line);
+                    STACKCOUNTER++;
+                    FOUND = 1;
+                    list = list->next;
+                    token();
+                }
+
+            }
+        }
+    }
+
+    strcpy(place,"FACTOR()");
+
+    if(FOUND == 1){
+        strcpy(msg,"The program has passed this parsing stage successfully!");
+        strcpy(result,"SUCCESS");
+        ErrorLog(result,msg,place);
+        return 1;
+    }else{
+        strcpy(msg,"Format Error - Unrecognized Factor , [-<factor> ::= id | ( <exp> )]");
+        strcpy(result,"FAILURE");
+        ErrorLog(result,msg,place);
+        return 0;
+    }
+
+
+
+
+
+}
 
 int PROG(){
     int FOUND = 0;
@@ -542,7 +895,7 @@ int PROG(){
         if((strcmp(list->type,"2")==0) &&FOUND == 1){
             list = list->next;
             token();
-            if(ID_LIST() == 1){
+            if(DEC_LIST() == 1){
                 FOUND = 1;
             }else{
                 FOUND = 0;
@@ -573,6 +926,12 @@ int PROG(){
         strcpy(msg,"THE PROGRAM HAS BEEN PARSED SUCCESSFULLY!");
         strcpy(result,"SUCCESS");
         ErrorLog(result,msg,place);
+
+        // code generation
+        printf("\tLDL\tRETADR\n");
+        printf("\tRSUB\n");
+        printf("\tEND\n");
+
         return 1;
     }else{
         strcpy(msg,"Fatal Error - While Parsing the program.");
@@ -580,7 +939,6 @@ int PROG(){
         ErrorLog(result,msg,place);
         return 0;
     }
-
 
 }
 
@@ -599,6 +957,16 @@ int PROG_NAME(){
         strcpy(msg,"The program has passed this parsing stage successfully!");
         strcpy(result,"SUCCESS");
         ErrorLog(result,msg,place);
+
+        // code generation
+
+        printf("\tSTART\t0\n");
+        printf("\tEXTREF XREAD,XWRITE\n");
+        printf("\tSTL\tRETADR\n");
+        printf("\tJ\tEXAADDR\n");
+        printf("RETADR\tRESW\t1\n");
+        LOCCTR+=3;
+
         return 1;
     }else{
         strcpy(msg,"Error - The Program name either missing or unrecognized , [-<prog-name>	::=  id].");
@@ -674,3 +1042,174 @@ void ErrorLog(char*result , char*msg, char*place){
     fprintf(logf,"[%d]\t[%s]\t\t%s\t\t%s\n",list->line-1,place,result,msg);
     fclose(logf);
 }
+
+// --------------------------------------------------- Queue implementation
+
+/* Create a Queue */
+Queue * initQueue(int max)
+{
+    Queue *Q;
+    Q = (Queue *)malloc(sizeof(Queue));
+    Q->size = 0;
+    Q->capacity = max;
+    /* initialize the list head. Kernel list method */
+    INIT_LIST_HEAD(&Q->list);
+    return Q;
+}
+
+/* pop out the queue front, and free the element space */
+void dequeue(Queue *Q)
+{
+    Queue* tmp;
+    if(Q->size==0){
+	printf("Queue is Empty.\n");
+	return;
+    }else{
+	Q->size--;
+	tmp = list_entry(Q->list.next, Queue, list);
+	list_del(Q->list.next);
+	free(tmp);
+    }
+}
+
+QueueElement front(Queue *Q)
+{
+    Queue* first_element;
+    struct list_head * first;
+    if(Q->size==0){
+	printf("Queue is Empty\n");
+	exit(0);
+    }
+    /* find the first element first */
+    first = Q->list.next;
+    /* reconstruct the first structure */
+    first_element = list_entry(first, Queue, list);
+    return first_element->e;
+}
+
+QueueElement tail(Queue *Q)
+{
+    Queue* last_element;
+    struct list_head * last;
+    if(Q->size==0){
+	printf("Queue is Empty.\n");
+	exit(0);
+    }
+    /* find the last element first */
+    last = Q->list.prev;
+    /* reconstruct the last structure */
+    last_element = list_entry(last, Queue, list);
+    return last_element->e;
+}
+
+void enqueue(Queue *Q, QueueElement element)
+{
+    Queue* newQ;
+    if(Q->size == Q->capacity){
+	printf("Queue is Full. No element added.\n");
+    }
+    else{
+	Q->size++;
+	newQ = (Queue*) malloc(sizeof(Queue));
+	newQ->e = element;
+	/* add to the list tail */
+	list_add_tail(&(newQ->list), &(Q->list));
+    }
+}
+
+
+// --------------------------------------- STACK implementation
+
+
+/**
+ * Create a new stack instance
+ */
+struct stack_t *newStack(void)
+{
+  struct stack_t *stack = malloc(sizeof *stack);
+  if (stack)
+  {
+    stack->head = NULL;
+    stack->stackSize = 0;
+  }
+  return stack;
+}
+
+/**
+ * Make a copy of the string to be stored (assumes
+ * strdup() or similar functionality is not
+ * available
+ */
+char *copyString(char *str)
+{
+  char *tmp = malloc(strlen(str) + 1);
+  if (tmp)
+    strcpy(tmp, str);
+  return tmp;
+}
+
+/**
+ * Push a value onto the stack
+ */
+void pushs(struct stack_t *theStack, char *value)
+{
+  struct stack_entry *entry = malloc(sizeof *entry);
+  if (entry)
+  {
+    entry->data = copyString(value);
+    entry->next = theStack->head;
+    theStack->head = entry;
+    theStack->stackSize++;
+  }
+  else
+  {
+    // handle error here
+  }
+}
+
+/**
+ * Get the value at the top of the stack
+ */
+char *top(struct stack_t *theStack)
+{
+  if (theStack && theStack->head)
+    return theStack->head->data;
+  else
+    return NULL;
+}
+
+/**
+ * Pop the top element from the stack; this deletes both
+ * the stack entry and the string it points to
+ */
+void pop(struct stack_t *theStack)
+{
+  if (theStack->head != NULL)
+  {
+    struct stack_entry *tmp = theStack->head;
+    theStack->head = theStack->head->next;
+    free(tmp->data);
+    free(tmp);
+    theStack->stackSize--;
+  }
+}
+
+/**
+ * Clear all elements from the stack
+ */
+void clear (struct stack_t *theStack)
+{
+  while (theStack->head != NULL)
+    pop(theStack);
+}
+
+/**
+ * Destroy a stack instance
+ */
+void destroyStack(struct stack_t **theStack)
+{
+  clear(*theStack);
+  free(*theStack);
+  *theStack = NULL;
+}
+
