@@ -4,12 +4,13 @@
 #include <ctype.h>
 #include "list.h"
 
+#define MAX_LENGTH 50
 
 // A linked list node
 struct Node
 {
-    char data[10];
-    char type[10];
+    char data[MAX_LENGTH];
+    char type[MAX_LENGTH];
     int line;
     int size;
     struct Node *next;
@@ -107,7 +108,7 @@ int STACKCOUNTER = 0;
 // program counter
 int LOCCTR = 0;
 // contains the variable which is in the A ATM .
-char rn[20];
+char rn[MAX_LENGTH];
 
 
 
@@ -125,7 +126,7 @@ int main()
     fprintf(logf,"[#Line]\t[Parse-Stage]\t\tResult\t\tInformations\n\n");
     fclose(logf);
 
-    char label[10],name[10],keyword[10],tokentype[10];
+    char label[MAX_LENGTH],name[MAX_LENGTH],keyword[MAX_LENGTH],tokentype[MAX_LENGTH];
     int lines = 1;
 
     fscanf(inputf,"%s %s\n",label,name);
@@ -143,7 +144,7 @@ int main()
         lines++;
     }
 
-    char c , token[10];
+    char c , token[MAX_LENGTH];
     int i=0,Iskeyword=0;
     while(fscanf(inputf,"%c",&c) != EOF){
 
@@ -725,7 +726,7 @@ int FACTOR(){
 int ASSIGN(){
 
     int FOUND = 0;
-    char id[20]; // save variable result into it
+    char id[MAX_LENGTH]; // save variable result into it
 
     if(strcmp(list->type,"22")==0){
         strcpy(id,list->data);
