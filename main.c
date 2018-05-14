@@ -56,6 +56,7 @@ int IsValidNumber(char * string);
 int IsValidNumberOrLetter(char c);
 void append(struct Node** head_ref, char* new_data , char* new_data2 , int line);
 void push(struct Node** head_ref, char* new_data , char* new_data2 ,int line);
+void tokenizer(char* input);
 
 // Parser.
 int PROG();
@@ -112,13 +113,25 @@ char rn[MAX_LENGTH];
 
 
 
-int main()
-{
-    q = initQueue(265); // queue
-    //s = newStack(); // stack
+int main(int argc, char **argv){
 
-    FILE *inputf,*schemaf,*tokensf;
-    inputf      = fopen("hourstomins.txt","r");
+    q = initQueue(265); // queue
+    tokenizer(argv[1]);
+
+    // Parser
+    if(PROG() == 1){
+        printf("\nParsed successfully ...");
+    }else{
+        printf("\nFailed While Parsing ... ");
+    }
+
+    return 0;
+}
+
+void tokenizer(char* input){
+
+     FILE *inputf,*schemaf,*tokensf;
+    inputf      = fopen(input,"r");
     schemaf     = fopen("schema.txt","r");
     tokensf     = fopen("tokens.txt","w");
     remove("log.txt"); // remove the previous log file
@@ -245,16 +258,9 @@ int main()
     //printf("%d\t5\t\tEND.\n",lines);
     append(&list,"END.","5",lines);
 
-    // Parser
 
-    if(PROG() == 1){
-        printf("\nParsed successfully ...");
-    }else{
-        printf("\nFailed While Parsing ... ");
-    }
-
-    return 0;
 }
+
 
 int IsValidNumberOrLetter(char c){
 
